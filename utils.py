@@ -1,13 +1,14 @@
 import os
-import random
-import numpy as np
+
 import torch
 import torch_geometric
 import args_set
+
 args = args_set.parser.parse_args()  # 获取设置的参
 
 
-def set_random_seed(seed=args.seed):
+# set the random seed
+def set_random_seed( seed=args.seed ):
 	torch_geometric.seed_everything(seed)
 	torch.backends.cudnn.benchmark = False
 	torch.backends.cudnn.deterministic = True
@@ -15,8 +16,20 @@ def set_random_seed(seed=args.seed):
 		torch.cuda.manual_seed(seed)
 
 
+# show the hyperparameter of model
 def show_Hyperparameter( args ):
 	argsDict = args.__dict__  # 获取类中包含的属性
 	# print(argsDict)
 	for key in argsDict:
 		print(key, ':', argsDict[key])
+
+
+# document path
+def generate_raw_processed_dir():
+	root = os.getcwd()
+	data_dir = os.path.join(root, 'data')
+
+	[os.mkdir(data_dir + "/" + i) for i in ['raw', 'processed'] if not os.path.exists(data_dir + "/" + i)]
+	raw_dir = os.path.join(data_dir, 'raw')
+	processed_dir = os.path.join(data_dir, 'processed')
+	return root, data_dir, raw_dir, processed_dir
