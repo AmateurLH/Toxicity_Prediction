@@ -1,7 +1,11 @@
 import os
 
+import networkx as nx
+import numpy as np
 import torch
 import torch_geometric
+from matplotlib import pyplot as plt
+
 import args_set
 
 args = args_set.parser.parse_args()  # 获取设置的参
@@ -33,3 +37,14 @@ def generate_raw_processed_dir():
 	raw_dir = os.path.join(data_dir, 'raw')
 	processed_dir = os.path.join(data_dir, 'processed')
 	return root, data_dir, raw_dir, processed_dir
+
+
+# show the graph
+def graph_showing( data ):
+	G = nx.Graph()
+	edge_index = data['edge_index'].t()
+	edge_index = np.array(edge_index.cpu())
+	G.add_edges_from(edge_index)
+
+	nx.draw(G, with_labels=True)
+	plt.show()

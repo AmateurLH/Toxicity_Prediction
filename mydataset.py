@@ -1,7 +1,9 @@
 import os
 
+import networkx as nx
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
 
 from tqdm import tqdm
 
@@ -13,11 +15,10 @@ import torch
 from torch_geometric.data import Dataset, Data
 from torch_geometric.loader import DataLoader
 
-from utils import set_random_seed
-from utils import generate_raw_processed_dir
+import utils
 
-set_random_seed()
-root, data_dir, raw_dir, processed_dir = generate_raw_processed_dir()
+utils.set_random_seed()
+root, data_dir, raw_dir, processed_dir = utils.generate_raw_processed_dir()
 
 
 def raw_label_processed( dir=raw_dir + '/Toxicity_SMILES.xlsx', animal='rat', route='oral' ):
@@ -67,10 +68,10 @@ def generate_raw_train_data( animal='rat', route='oral' ):
 # raw_label_processed()
 train_data_dir, test_data_dir = generate_raw_train_data('rat', 'oral')
 
+
 # generate_raw_train_data('rat', 'subcutaneous')
 # generate_raw_train_data('mouse', 'oral')
 # generate_raw_train_data('mouse', 'subcutaneous')
-
 
 
 class MyDataSets(Dataset):
@@ -122,10 +123,12 @@ class MyDataSets(Dataset):
 			data_list.append(data)  # Append to the list
 		if not self.test:
 			for i in range(len(data_list)):
-				torch.save(data_list[i], self.processed_dir_train_data + f"/data_{i}.pt")  # Save each graph object as a separate file in the processed directory
+				torch.save(data_list[i],
+				           self.processed_dir_train_data + f"/data_{i}.pt")  # Save each graph object as a separate file in the processed directory
 		else:
 			for i in range(len(data_list)):
-				torch.save(data_list[i], self.processed_dir_test_data + f"/data_{i}.pt")  # Save each graph object as a separate file in the processed directory
+				torch.save(data_list[i],
+				           self.processed_dir_test_data + f"/data_{i}.pt")  # Save each graph object as a separate file in the processed directory
 
 	def len( self ):
 		if not self.test:
@@ -145,15 +148,21 @@ class MyDataSets(Dataset):
 		return data
 
 
-train_dataset = MyDataSets(root, train_data_dir, test=False)
-test_dataset = MyDataSets(root, test_data_dir, test=True)
-train_dataloader = DataLoader(train_dataset, batch_size=1, shuffle=True)
-test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
-count = 0
-for batch in test_dataloader:
-	count += 1
-	print(batch)
-print(count)
+# train_dataset = MyDataSets(root, train_data_dir, test=False)
+# test_dataset = MyDataSets(root, test_data_dir, test=True)
+
+# for i in range(len(test_dataset)):
+# 	print(test_dataset[i].smiles)
+# 	utils.graph_showing(test_dataset[i])
+
+
+# train_dataloader = DataLoader(train_dataset, batch_size=1, shuffle=True)
+# test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
+# count = 0
+# for batch in test_dataloader:
+# 	count += 1
+# 	print(batch)
+# print(count)
 
 
 def normalize_pDose():

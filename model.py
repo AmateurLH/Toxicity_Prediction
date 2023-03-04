@@ -6,25 +6,22 @@ from torch.nn import functional as F
 
 
 class GCN(torch.nn.Module):
-	def __init__( self, dataset, hidden_channels ):
+	def __init__( self, num_feature, hidden_channels, num_class ):
 		super(GCN, self).__init__()
-		self.conv1 = GCNConv(dataset.get(0).x.shape[1], hidden_channels)
-		self.conv2 = GCNConv(hidden_channels, hidden_channels)
-		self.conv3 = GCNConv(hidden_channels, hidden_channels)
-		self.lin = Linear(hidden_channels, 5)
+		self.conv1 = GCNConv(num_feature, hidden_channels)
+		self.conv2 = GCNConv(hidden_channels, num_class)
+		self.lin = Linear(num_class, num_class)
 
-	def forward(self, x, edge_index, batch):
+	def forward( self, data ):
 		# 1. Obtain node embeddings
 		# print(np.array(x).shape)
-		edge_index = torch.tensor(np.squeeze(np.array(edge_index)))
+		x, edge_index = data.x, data.edge_index
 		x = self.conv1(x, edge_index)
 		x = x.relu()
 		x = self.conv2(x, edge_index)
-		x = x.relu()
-		x = self.conv3(x, edge_index)
 
 		# 2. Readout layer
-		x = global_mean_pool(x, batch)  # [batch_size, hidden_channels]
+		x = global_mean_pool(x, data.batch)  # [batch_size, hidden_channels]
 
 		# 3. Apply a final classifier
 		x = F.dropout(x, p=0.5, training=self.training)
