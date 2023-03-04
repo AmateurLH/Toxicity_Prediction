@@ -70,7 +70,7 @@ train_data_dir, test_data_dir = generate_raw_train_data('rat', 'oral')
 # generate_raw_train_data('rat', 'subcutaneous')
 # generate_raw_train_data('mouse', 'oral')
 # generate_raw_train_data('mouse', 'subcutaneous')
-print(len(processed_dir))
+
 
 
 class MyDataSets(Dataset):
