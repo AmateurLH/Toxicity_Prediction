@@ -1,13 +1,13 @@
 import torch
+from torch import nn
 from torch_geometric.loader import DataLoader
 import utils
 from mydataset import MyDataSets, generate_raw_train_data
 from model import GCN
-from torch.nn import functional as F
 
 root, data_dir, raw_dir, processed_dir = utils.generate_raw_processed_dir()
 
-train_data_dir, test_data_dir = generate_raw_train_data('rat', 'oral')
+train_data_dir, test_data_dir = generate_raw_train_data('mouse', 'subcutaneous')
 
 train_dataset = MyDataSets(root, train_data_dir, test=False)
 test_dataset = MyDataSets(root, test_data_dir, test=True)
@@ -22,16 +22,18 @@ print(model)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+
 # model = model.to(device)
 
 
-def train( model, data_loader, optimizer ):
+def train( model, data_loader, optimizer, criterion=nn.CrossEntropyLoss() ):
 	model.train()
 	total_loss = 0
 	for data in data_loader:
 		optimizer.zero_grad()
 		out = model(data)
-		loss = F.cross_entropy(out, data.y)
+		loss = criterion(out, data.y)
 		loss.backward()
 		optimizer.step()
 		total_loss += loss.item() * data.num_graphs
